@@ -15,14 +15,14 @@ export default function BoardRecenterButton() {
 
   return (
     <Button
-      className={`rounded-full !p-2 absolute bottom-2 right-2 ${
-        position.x === 0 && position.y === 0 ? '!text-primary' : ''
+      className={`rounded-full !p-2 ${
+        position.x === 0 && position.y === 0 ? 'text-white' : ''
       }`}
-      colorway="neutral"
-      variant="text"
+      colorway={position.x === 0 && position.y === 0 ? 'primary' : 'neutral'}
+      variant="solid"
       onClick={handleClick}
     >
-      <Crosshair />
+      <Crosshair size={20} />
     </Button>
   );
 }

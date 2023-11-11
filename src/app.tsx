@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import App from '@/components/App';
 import './index.css';
 import { ThemeProvider } from './state/app/theme';
+import * as Tooltip from '@radix-ui/react-tooltip';
 
 const root = document.querySelector('#root');
 
@@ -20,6 +21,8 @@ if (!root) {
       theme = window.matchMedia('(prefers-color-scheme: dark)').matches
         ? 'dark'
         : 'light';
+
+      localStorage.setItem('app/theme', 'system');
     }
 
     if (theme === 'dark') {
@@ -28,14 +31,20 @@ if (!root) {
       html?.classList.add('light');
     }
   } else {
-    localStorage.setItem('app/theme', 'system');
+    const theme = localStorage.getItem('app/theme');
+
+    if (theme !== 'dark' && theme !== 'light') {
+      localStorage.setItem('app/theme', 'system');
+    }
   }
 
   ReactDOM.createRoot(root).render(
     <React.StrictMode>
-      <ThemeProvider>
-        <App />
-      </ThemeProvider>
+      <Tooltip.Provider>
+        <ThemeProvider>
+          <App />
+        </ThemeProvider>
+      </Tooltip.Provider>
     </React.StrictMode>,
   );
 }

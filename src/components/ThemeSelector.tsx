@@ -70,6 +70,7 @@ export default function ThemeSelector() {
             ),
             onSelect: () => {
               setTheme('system');
+              localStorage.setItem('app/theme', 'system');
             },
           },
           {
@@ -80,6 +81,7 @@ export default function ThemeSelector() {
             ),
             onSelect: () => {
               setTheme('light');
+              localStorage.setItem('app/theme', 'light');
             },
           },
           {
@@ -90,6 +92,7 @@ export default function ThemeSelector() {
             ),
             onSelect: () => {
               setTheme('dark');
+              localStorage.setItem('app/theme', 'dark');
             },
           },
         ]}

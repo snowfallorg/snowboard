@@ -19,7 +19,7 @@ const colorwayClassNames: Record<Variant, Record<Colorway, string>> = {
     error: 'bg-error border border-transparent',
     warning: 'bg-warning border border-transparent',
     success: 'bg-success border border-transparent',
-    neutral: 'bg-foreground text-background border border-transpraent',
+    neutral: 'bg-foreground text-background border border-transparent',
   },
   outline: {
     primary:

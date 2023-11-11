@@ -44,22 +44,27 @@ export default function BoardBackground(props: BoardBackgroundProps) {
       const viewport = getViewport();
       const position = getPosition();
 
+      const zoomedViewport = {
+        width: viewport.width / viewport.zoom,
+        height: viewport.height / viewport.zoom,
+      };
+
       canvas.width = viewport.width;
       canvas.height = viewport.height;
 
       const color =
         getComputedStyle(canvas).getPropertyValue('--color-foreground');
 
-      const xOffset = position.x % gap;
-      const yOffset = position.y % gap;
+      const xOffset = -position.x % gap;
+      const yOffset = -position.y % gap;
 
       // NOTE: We intentionally overscan to ensure that dots on the edges don't
       // cause flicker.
-      const columns = Math.ceil(viewport.width / gap) + 3;
-      const rows = Math.ceil(viewport.height / gap) + 3;
+      const columns = Math.ceil(zoomedViewport.width / gap) + 3;
+      const rows = Math.ceil(zoomedViewport.height / gap) + 3;
 
       ctx.clearRect(0, 0, viewport.width, viewport.height);
-      ctx.fillStyle = `rgba(${color}, 0.5)`;
+      ctx.fillStyle = `rgba(${color}, 0.15)`;
 
       // draw a dot for each cell
       for (let row = 0; row < rows; row++) {
@@ -67,10 +72,10 @@ export default function BoardBackground(props: BoardBackgroundProps) {
           ctx.beginPath();
 
           ctx.ellipse(
-            row * gap + xOffset - gap + BASE_BOARD_OFFSET,
-            column * gap + yOffset - gap + BASE_BOARD_OFFSET,
-            size / 2,
-            size / 2,
+            (column * gap + xOffset - gap + BASE_BOARD_OFFSET) * viewport.zoom,
+            (row * gap + yOffset - gap + BASE_BOARD_OFFSET) * viewport.zoom,
+            (size / 2) * viewport.zoom,
+            (size / 2) * viewport.zoom,
             0,
             0,
             Math.PI * 2,

@@ -1,8 +1,9 @@
-import { File, Star } from 'react-feather';
+import { File, HelpCircle, Star } from 'react-feather';
 import Button from './Button';
 import ThemeSelector from './ThemeSelector';
 import { fileAtom } from '@/state/app/file';
 import { useSetAtom } from 'jotai';
+import Tooltip from './Tooltip';
 
 export default function Header() {
   const setFile = useSetAtom(fileAtom);
@@ -55,14 +56,35 @@ export default function Header() {
         <span className="text-md font-bold">Snowboard</span>
       </div>
       <div className="flex items-center gap-2">
-        <Button variant="text" colorway="neutral" onClick={handleNew}>
-          <Star size={18} />
-          New
-        </Button>
-        <Button variant="text" colorway="neutral" onClick={handleOpen}>
-          <File size={18} />
-          Open
-        </Button>
+        <Tooltip tooltip="New File">
+          <Button
+            variant="text"
+            colorway="neutral"
+            onClick={handleNew}
+            className="!p-2 hover:!bg-background"
+          >
+            <Star size={18} />
+          </Button>
+        </Tooltip>
+        <Tooltip tooltip="Open File">
+          <Button
+            variant="text"
+            colorway="neutral"
+            onClick={handleOpen}
+            className="!p-2 hover:!bg-background"
+          >
+            <File size={18} />
+          </Button>
+        </Tooltip>
+        <Tooltip tooltip="Help">
+          <Button
+            variant="text"
+            colorway="neutral"
+            className="!p-2 hover:!bg-background"
+          >
+            <HelpCircle size={18} />
+          </Button>
+        </Tooltip>
         <ThemeSelector />
       </div>
     </header>
