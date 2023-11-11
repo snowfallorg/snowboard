@@ -1,0 +1,70 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+
+  --color-nord0: 46, 52, 64;
+  --color-nord1: 59, 66, 82;
+  --color-nord2: 67, 76, 94;
+  --color-nord3: 76, 86, 106;
+  --color-nord4: 216, 222, 233;
+  --color-nord5: 229, 233, 240;
+  --color-nord6: 236, 239, 244;
+  --color-nord7: 143, 188, 187;
+  --color-nord8: 136, 192, 208;
+  --color-nord9: 129, 161, 193;
+  --color-nord10: 94, 129, 172;
+  --color-nord11: 191, 97, 106;
+  --color-nord12: 208, 135, 112;
+  --color-nord13: 235, 203, 139;
+  --color-nord14: 163, 190, 140;
+  --color-nord15: 180, 142, 173;
+}
+
+html {
+  --color-background: var(--color-nord5);
+  --color-background-light: var(--color-nord6);
+  --color-background-dark: var(--color-nord4);
+
+  --color-foreground: var(--color-nord1);
+  --color-foreground-light: var(--color-nord2);
+  --color-foreground-dark: var(--color-nord0);
+
+  --color-primary: var(--color-nord10);
+  --color-secondary: var(--color-nord15);
+
+  --color-error: var(--color-nord11);
+  --color-warning: var(--color-nord12);
+  --color-success: var(--color-nord14);
+}
+
+html.dark {
+  --color-background: var(--color-nord1);
+  --color-background-light: var(--color-nord2);
+  --color-background-dark: var(--color-nord0);
+
+  --color-foreground: var(--color-nord5);
+  --color-foreground-light: var(--color-nord6);
+  --color-foreground-dark: var(--color-nord4);
+}
+
+html,
+body,
+#root {
+  @apply w-full h-full;
+}
+
+#root {
+  @apply flex;
+}
+
+::selection {
+  background-color: rgba(var(--color-primary), 1);
+  color: rgba(var(--color-foreground), 1);
+}
