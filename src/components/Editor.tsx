@@ -27,8 +27,8 @@ export default function Editor(props: EditorProps) {
           node: ast,
           width: 0,
           height: 0,
-          x: 0,
-          y: 0,
+          x: 8,
+          y: 8,
         },
       ]);
     } catch (error) {

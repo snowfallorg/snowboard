@@ -29,6 +29,6 @@ export const zoomViewportAtom = atom(null, (get, set, delta: number) => {
 
   set(viewportAtom, {
     ...viewport,
-    zoom: Math.min(Math.max(viewport.zoom + delta, 0.5), 2),
+    zoom: Math.min(Math.max(viewport.zoom + delta, 0.2), 2),
   });
 });

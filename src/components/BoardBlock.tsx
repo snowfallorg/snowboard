@@ -17,6 +17,8 @@ import useLatest from '@/hooks/util/useLatest';
 import { NodeKind } from '@snowfallorg/sleet';
 import useGetAtomValue from '@/hooks/util/useGetAtomValue';
 import BoardEmbeddedBlock from './BoardEmbeddedBlock';
+import BoardBlockContent from './BoardBlockContent';
+import { nodeNameToBlockName } from '@/lib/blocks';
 
 export const VISIBLE_AREA_PADDING = 20;
 
@@ -148,77 +150,6 @@ export default function BoardBlock(props: BoardBlockProps) {
     [blockRef, getViewport, moveBlock],
   );
 
-  const renderContent = () => {
-    switch (block.node.kind) {
-      case NodeKind.Root:
-        // If there's not a sub expression here, we should keep the slot empty.
-        if (block.node.value.value.kind !== NodeKind.SubExpr) {
-          return (
-            <div className="min-h-[50px] bg-background bg-opacity-30 rounded py-1 px-2 flex items-center justify-center"></div>
-          );
-        }
-
-        return (
-          <div className="min-h-[50px] rounded py-1 px-2 flex items-center justify-center">
-            <BoardEmbeddedBlock
-              node={block.node.value.value.value}
-              path={['value', 'value', 'value']}
-            />
-          </div>
-        );
-      case NodeKind.Comment:
-      case NodeKind.Expr:
-      case NodeKind.UnaryExpr:
-      case NodeKind.BinaryExpr:
-      case NodeKind.SubExpr:
-      case NodeKind.Conditional:
-      case NodeKind.Modifier:
-      case NodeKind.LetIn:
-      case NodeKind.Import:
-      case NodeKind.Fallback:
-      case NodeKind.Identifier:
-      case NodeKind.Null:
-      case NodeKind.Int:
-      case NodeKind.Float:
-      case NodeKind.Bool:
-      case NodeKind.String:
-      case NodeKind.Path:
-      case NodeKind.Attrs:
-      case NodeKind.Attr:
-      case NodeKind.List:
-      case NodeKind.Fn:
-      case NodeKind.FnParams:
-      case NodeKind.FnParam:
-      case NodeKind.FnCall:
-      case NodeKind.Has:
-      case NodeKind.Eq:
-      case NodeKind.EqEq:
-      case NodeKind.NotEq:
-      case NodeKind.Not:
-      case NodeKind.Lt:
-      case NodeKind.Lte:
-      case NodeKind.Gt:
-      case NodeKind.Gte:
-      case NodeKind.Add:
-      case NodeKind.Sub:
-      case NodeKind.Mul:
-      case NodeKind.Div:
-      case NodeKind.Imp:
-      case NodeKind.Update:
-      case NodeKind.Concat:
-      case NodeKind.Or:
-      case NodeKind.And:
-      case NodeKind.Period:
-      case NodeKind.Interp:
-      default:
-        return (
-          <div className="min-h-[50px] bg-background bg-opacity-30 rounded py-1 px-2 flex items-center justify-center">
-            Unsupported
-          </div>
-        );
-    }
-  };
-
   return (
     <div
       ref={rootRef}
@@ -232,11 +163,11 @@ export default function BoardBlock(props: BoardBlockProps) {
         }`}
         onMouseDown={handleTitleBarMouseDown}
       >
-        {props.block.node.kind}
+        {nodeNameToBlockName[props.block.node.kind]}
       </div>
       <hr className="h-[1px] border-none bg-foreground bg-opacity-10" />
       <div className="p-2 text-foreground" onMouseDown={handleMouseDown}>
-        {renderContent()}
+        <BoardBlockContent node={block.node} path={[]} />
       </div>
     </div>
   );
