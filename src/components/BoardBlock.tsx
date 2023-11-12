@@ -1,6 +1,7 @@
 import {
   Block,
   moveBlockAtom,
+  relativeMoveBlockAtom,
   resizeBlockAtom,
 } from '@/state/editor/board/blocks';
 import {
@@ -29,14 +30,13 @@ export interface BoardBlockProps {
 export default function BoardBlock(props: BoardBlockProps) {
   const { block } = props;
 
+  const { id } = block;
+
   const rootRef = useRef<HTMLDivElement>(null);
   const viewport = useAtomValue(viewportAtom);
   const position = useAtomValue(positionAtom);
-  const getViewport = useGetAtomValue(viewportAtom);
   const resizeBlock = useSetAtom(resizeBlockAtom);
-  const moveBlock = useSetAtom(moveBlockAtom);
-
-  const blockRef = useLatest(block);
+  const relativeMoveBlock = useSetAtom(relativeMoveBlockAtom);
 
   const [isVisible, setIsVisible] = useState(true);
 
@@ -49,7 +49,7 @@ export default function BoardBlock(props: BoardBlockProps) {
 
     const onResize = () => {
       const bounds = root.getBoundingClientRect();
-      resizeBlock(blockRef.current, {
+      resizeBlock(id, {
         width: bounds.width,
         height: bounds.height,
       });
@@ -62,7 +62,7 @@ export default function BoardBlock(props: BoardBlockProps) {
     return () => {
       window.removeEventListener('resize', onResize);
     };
-  }, [resizeBlock, blockRef]);
+  }, [resizeBlock, id]);
 
   useEffect(() => {
     // check if the block is within the visible area using block.width, block.height, block.x, block.y
@@ -110,7 +110,7 @@ export default function BoardBlock(props: BoardBlockProps) {
     rootRef.current.style.transform = `translate(${block.x - position.x}px, ${
       block.y - position.y
     }px)`;
-  }, [blockRef, block, position, viewport]);
+  }, [block, position, viewport]);
 
   const handleMouseDown = (event: React.MouseEvent) => {
     if (event.button !== 2) {
@@ -120,7 +120,7 @@ export default function BoardBlock(props: BoardBlockProps) {
 
   const handleTitleBarMouseDown = useCallback(
     (event: React.MouseEvent) => {
-      if (event.button === 2) {
+      if (event.button !== 0) {
         return;
       }
 
@@ -130,11 +130,9 @@ export default function BoardBlock(props: BoardBlockProps) {
       document.body.style.cursor = 'grabbing';
 
       const handleMove = (event: MouseEvent) => {
-        const viewport = getViewport();
-
-        moveBlock(blockRef.current, {
-          x: blockRef.current.x + event.movementX / viewport.zoom,
-          y: blockRef.current.y + event.movementY / viewport.zoom,
+        relativeMoveBlock(id, {
+          x: event.movementX,
+          y: event.movementY,
         });
       };
 
@@ -147,13 +145,13 @@ export default function BoardBlock(props: BoardBlockProps) {
       window.addEventListener('mousemove', handleMove);
       window.addEventListener('mouseup', handleMouseUp);
     },
-    [blockRef, getViewport, moveBlock],
+    [relativeMoveBlock, id],
   );
 
   return (
     <div
       ref={rootRef}
-      className={`inline-flex flex-col rounded-md min-w-[200px] bg-background-light border border-foreground/20 overflow-hidden ${
+      className={`absolute inline-flex flex-col rounded-md min-w-[200px] bg-background-light border border-foreground/20 overflow-hidden ${
         isVisible ? '' : 'hidden'
       }`}
     >
@@ -167,7 +165,7 @@ export default function BoardBlock(props: BoardBlockProps) {
       </div>
       <hr className="h-[1px] border-none bg-foreground bg-opacity-10" />
       <div className="p-2 text-foreground" onMouseDown={handleMouseDown}>
-        <BoardBlockContent node={block.node} path={[]} />
+        <BoardBlockContent block={block} node={block.node} path={[]} />
       </div>
     </div>
   );

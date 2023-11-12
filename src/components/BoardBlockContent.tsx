@@ -2,19 +2,31 @@ import {
   AstNode,
   NodeKind,
   isAttrBinding,
+  isDestructuredFnParams,
+  isIdentifierFnParams,
   isInheritBinding,
 } from '@snowfallorg/sleet';
 import BoardEmbeddedBlock from './BoardEmbeddedBlock';
 import Input from './Input';
 import Checkbox from './Checkbox';
+import { Block } from '@/state/editor/board/blocks';
 
 export interface BoardBlockContentProps {
-  node: AstNode;
+  block: Block;
+  node?: AstNode;
   path: string[];
 }
 
 export default function BoardBlockContent(props: BoardBlockContentProps) {
-  const { node, path } = props;
+  const { block, node, path } = props;
+
+  if (!node) {
+    return (
+      <div className="min-h-[50px] bg-background bg-opacity-30 rounded py-1 px-2 flex items-center justify-center">
+        Content Node Deleted: node.{path.join('.')}
+      </div>
+    );
+  }
 
   switch (node.kind) {
     case NodeKind.Root:
@@ -28,6 +40,7 @@ export default function BoardBlockContent(props: BoardBlockContentProps) {
       return (
         <div className="min-h-[50px] rounded py-1 px-2 flex items-start justify-center">
           <BoardEmbeddedBlock
+            block={block}
             node={node.value.value.value}
             path={[...path, 'value', 'value', 'value']}
           />
@@ -37,7 +50,12 @@ export default function BoardBlockContent(props: BoardBlockContentProps) {
       return (
         <div className="min-h-[50px] rounded py-1 px-2 flex flex-col items-start justify-center gap-2">
           {node.value.map((attr, i) => (
-            <BoardEmbeddedBlock key={i} node={attr} path={[...path, 'value']} />
+            <BoardEmbeddedBlock
+              key={i}
+              block={block}
+              node={attr}
+              path={[...path, 'value', String(i)]}
+            />
           ))}
         </div>
       );
@@ -46,8 +64,16 @@ export default function BoardBlockContent(props: BoardBlockContentProps) {
         <div className="rounded py-1 px-2 flex items-start justify-center gap-2">
           {isAttrBinding(node) ? (
             <>
-              <BoardEmbeddedBlock node={node.name} path={[...path, 'name']} />
-              <BoardEmbeddedBlock node={node.value} path={[...path, 'value']} />
+              <BoardEmbeddedBlock
+                block={block}
+                node={node.name}
+                path={[...path, 'name']}
+              />
+              <BoardEmbeddedBlock
+                block={block}
+                node={node.value}
+                path={[...path, 'value']}
+              />
             </>
           ) : null}
           {isInheritBinding(node) ? 'inherit bindings are unsupported' : null}
@@ -94,6 +120,58 @@ export default function BoardBlockContent(props: BoardBlockContentProps) {
           {node.value ? 'True' : 'False'}
         </div>
       );
+    case NodeKind.Fn:
+      return (
+        <div className="rounded py-1 flex flex-col gap-2">
+          <BoardEmbeddedBlock
+            block={block}
+            node={node.args}
+            path={[...path, 'args']}
+          />
+          <BoardEmbeddedBlock
+            block={block}
+            node={node.body}
+            path={[...path, 'body']}
+          />
+        </div>
+      );
+    case NodeKind.FnParams:
+      return (
+        <div className="rounded py-1 flex flex-col gap-2">
+          {isIdentifierFnParams(node) ? (
+            <BoardEmbeddedBlock
+              block={block}
+              node={node.name}
+              path={[...path, 'name']}
+            />
+          ) : null}
+          {isDestructuredFnParams(node)
+            ? node.value.map((param, i) => (
+                <BoardEmbeddedBlock
+                  key={i}
+                  block={block}
+                  node={param}
+                  path={[...path, 'value', String(i)]}
+                />
+              ))
+            : null}
+        </div>
+      );
+    case NodeKind.LetIn:
+      return (
+        <div className="rounded py-1 flex flex-col gap-2">
+          {node.bindings.map((binding, i) => (
+            <BoardEmbeddedBlock
+              name="Variable Binding"
+              block={block}
+              key={i}
+              node={binding}
+              path={[...path, 'bindings', String(i)]}
+            />
+          ))}
+          <BoardEmbeddedBlock node={node.body} path={[...path, 'body']} />
+        </div>
+      );
     case NodeKind.Comment:
     case NodeKind.Expr:
     case NodeKind.UnaryExpr:
@@ -101,7 +179,6 @@ export default function BoardBlockContent(props: BoardBlockContentProps) {
     case NodeKind.SubExpr:
     case NodeKind.Conditional:
     case NodeKind.Modifier:
-    case NodeKind.LetIn:
     case NodeKind.Import:
     case NodeKind.Fallback:
     case NodeKind.Null:
@@ -109,8 +186,6 @@ export default function BoardBlockContent(props: BoardBlockContentProps) {
     case NodeKind.Float:
     case NodeKind.Path:
     case NodeKind.List:
-    case NodeKind.Fn:
-    case NodeKind.FnParams:
     case NodeKind.FnParam:
     case NodeKind.FnCall:
     case NodeKind.Has:
@@ -134,7 +209,7 @@ export default function BoardBlockContent(props: BoardBlockContentProps) {
     case NodeKind.Period:
     case NodeKind.Interp:
     default:
-      console.log('unsupported', node);
+      // console.log('unsupported', node);
       return (
         <div className="min-h-[50px] bg-background bg-opacity-30 rounded py-1 px-2 flex items-center justify-center">
           Unsupported: {node.kind}

@@ -36,6 +36,8 @@ export default function Board() {
       resizeViewport({
         width: bounds.width,
         height: bounds.height,
+        top: bounds.top,
+        left: bounds.left,
       });
     };
 
