@@ -119,11 +119,7 @@ export default function Board() {
       }}
     >
       <BoardBlocks />
-      <BoardButtons>
-        <BoardRecenterButton />
-        <BoardResetZoomButton />
-        <BoardDownloadButton />
-      </BoardButtons>
+      <BoardButtons />
       {isSizeUpdated ? <BoardBackground /> : null}
     </div>
   );

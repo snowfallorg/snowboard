@@ -11,6 +11,7 @@ export interface Block {
   height: number;
   x: number;
   y: number;
+  zIndex: number;
 }
 
 export const blocksAtom = atom<Block[]>([]);
@@ -75,11 +76,18 @@ export const relativeMoveBlockAtom = atom(
 
 export const addBlockAtom = atom(
   null,
-  (get, set, block: Omit<Block, 'id'>): string => {
+  (get, set, block: Omit<Block, 'id' | 'zIndex'>): string => {
     const id = createId();
 
     const blocks = get(blocksAtom);
-    set(blocksAtom, [...blocks, { ...block, id }]);
+
+    let zIndex = 0;
+
+    for (const block of blocks) {
+      zIndex = Math.max(zIndex, block.zIndex);
+    }
+
+    set(blocksAtom, [...blocks, { ...block, id, zIndex }]);
 
     return id;
   },
@@ -121,6 +129,38 @@ export const removeNodeAtom = atom(
           // @ts-expect-error Delete is okay inside of immer.
           // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
           delete node[last];
+        }
+      }),
+    );
+  },
+);
+
+export const insertNodeAtom = atom(
+  null,
+  (get, set, id: string, path: string[], node: AstNode) => {
+    const blocks = get(blocksAtom);
+
+    set(
+      blocksAtom,
+      produce(blocks, (draft) => {
+        const block = draft.find((b) => b.id === id);
+        if (!block) {
+          return;
+        }
+        let parent = block.node;
+        const last = path[path.length - 1];
+        console.log({ ...block.node }, path);
+        for (const p of path.slice(0, -1)) {
+          // @ts-expect-error This is nigh impossible to type.
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          parent = parent[p];
+        }
+        if (Array.isArray(parent)) {
+          parent.splice(Number(last), 0, node);
+        } else {
+          // @ts-expect-error Insert is okay inside of immer.
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          parent[last] = node;
         }
       }),
     );

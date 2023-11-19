@@ -10,6 +10,7 @@ import BoardEmbeddedBlock from './BoardEmbeddedBlock';
 import Input from './Input';
 import Checkbox from './Checkbox';
 import { Block } from '@/state/editor/board/blocks';
+import BoardSlot from './BoardSlot';
 
 export interface BoardBlockContentProps {
   block: Block;
@@ -57,6 +58,11 @@ export default function BoardBlockContent(props: BoardBlockContentProps) {
               path={[...path, 'value', String(i)]}
             />
           ))}
+          <BoardSlot
+            block={block}
+            path={[...path, 'value', String(node.value.length)]}
+            allow={[NodeKind.Attr]}
+          />
         </div>
       );
     case NodeKind.Attr:
@@ -68,6 +74,7 @@ export default function BoardBlockContent(props: BoardBlockContentProps) {
                 block={block}
                 node={node.name}
                 path={[...path, 'name']}
+                moveable={false}
               />
               <BoardEmbeddedBlock
                 block={block}
@@ -169,7 +176,11 @@ export default function BoardBlockContent(props: BoardBlockContentProps) {
               path={[...path, 'bindings', String(i)]}
             />
           ))}
-          <BoardEmbeddedBlock node={node.body} path={[...path, 'body']} />
+          <BoardEmbeddedBlock
+            block={block}
+            node={node.body}
+            path={[...path, 'body']}
+          />
         </div>
       );
     case NodeKind.Comment:

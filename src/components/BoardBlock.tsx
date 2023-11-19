@@ -20,6 +20,7 @@ import useGetAtomValue from '@/hooks/util/useGetAtomValue';
 import BoardEmbeddedBlock from './BoardEmbeddedBlock';
 import BoardBlockContent from './BoardBlockContent';
 import { nodeNameToBlockName } from '@/lib/blocks';
+import { draggingAtom, startDraggingAtom } from '@/state/editor/board/dragging';
 
 export const VISIBLE_AREA_PADDING = 20;
 
@@ -37,6 +38,10 @@ export default function BoardBlock(props: BoardBlockProps) {
   const position = useAtomValue(positionAtom);
   const resizeBlock = useSetAtom(resizeBlockAtom);
   const relativeMoveBlock = useSetAtom(relativeMoveBlockAtom);
+
+  const getDragging = useGetAtomValue(draggingAtom);
+  const setDragging = useSetAtom(draggingAtom);
+  const startDragging = useSetAtom(startDraggingAtom);
 
   const [isVisible, setIsVisible] = useState(true);
 
@@ -120,6 +125,13 @@ export default function BoardBlock(props: BoardBlockProps) {
 
   const handleTitleBarMouseDown = useCallback(
     (event: React.MouseEvent) => {
+      if (event.button === 1) {
+        console.log({ block, node: block.node, path: [] });
+        event.stopPropagation();
+        event.preventDefault();
+        return;
+      }
+
       if (event.button !== 0) {
         return;
       }
@@ -128,6 +140,8 @@ export default function BoardBlock(props: BoardBlockProps) {
       event.preventDefault();
 
       document.body.style.cursor = 'grabbing';
+
+      startDragging(id);
 
       const handleMove = (event: MouseEvent) => {
         relativeMoveBlock(id, {
@@ -140,6 +154,8 @@ export default function BoardBlock(props: BoardBlockProps) {
         window.removeEventListener('mousemove', handleMove);
         window.removeEventListener('mouseup', handleMouseUp);
         document.body.style.cursor = 'initial';
+
+        setDragging(null);
       };
 
       window.addEventListener('mousemove', handleMove);
@@ -154,6 +170,9 @@ export default function BoardBlock(props: BoardBlockProps) {
       className={`absolute inline-flex flex-col rounded-md min-w-[200px] bg-background-light border border-foreground/20 overflow-hidden ${
         isVisible ? '' : 'hidden'
       }`}
+      style={{
+        zIndex: block.zIndex,
+      }}
     >
       <div
         className={`px-4 py-1 font-bold ${
